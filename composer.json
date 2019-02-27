@@ -1,0 +1,22 @@
+{
+    "name": "reallywang/dynamo-db",
+    "description": "DynamoDB操作封装",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "ReallyWang",
+            "email": "w578285038@163.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "aws/aws-sdk-php": "^3.70",
+        "php": ">=7.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "ReallyWang\\DynamoDB\\": "src/ReallyWang/DynamoDB"
+        }
+    }
+}
