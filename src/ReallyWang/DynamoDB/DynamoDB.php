@@ -187,6 +187,32 @@ class DynamoDB
                     if ($isOr) {
                         $this->orCondition[] = $key;
                     }
+                } elseif ($value[0] == 'size') {
+                    if (in_array($value[1], ['<', '>', '>=', '<='])) {
+                        $this->condition[]                                      = "size({$key}) {$value[1]} :" . current($this->assignment);
+                        $this->conditionValue[':' . current($this->assignment)] = $value[2];
+                        if ($isOr) {
+                            $this->orCondition[] = "size({$key})";
+                        }
+                    } elseif ($value['1'] == 'between') {
+                        $sql                                                    = "size({$key}) {$value[1]} :" . current($this->assignment);
+                        $this->conditionValue[':' . current($this->assignment)] = $value[2];
+                        next($this->assignment);
+
+                        $sql                                                    .= " and :" . current($this->assignment);
+                        $this->conditionValue[':' . current($this->assignment)] = $value[3];
+
+                        $this->condition[] = $sql;
+                        if ($isOr) {
+                            $this->orCondition[] = "size({$key})";
+                        }
+                    } else {
+                        $this->condition[]                                      = "size({$key}) = :" . current($this->assignment);
+                        $this->conditionValue[':' . current($this->assignment)] = $value[1];
+                        if ($isOr) {
+                            $this->orCondition[] = "size({$key})";
+                        }
+                    }
                 } else {
                     return $this;
                 }
@@ -247,11 +273,14 @@ class DynamoDB
         }
     }
 
-    public function get()
+    public function get(int $page = 0)
     {
         $params = $this->recombination(true);
 
         try {
+            if ($page != 0) {
+                $params['pageSize'] = $page;
+            }
             $result = $this->dynamodb->query($params);
             $return = [];
             if ($result) {
@@ -269,11 +298,14 @@ class DynamoDB
         }
     }
 
-    public function scan()
+    public function scan(int $page = 0)
     {
         $params = $this->recombination(false, true);
 
         try {
+            if ($page != 0) {
+                $params['pageSize'] = $page;
+            }
             $result = $this->dynamodb->scan($params);
 
             $return = [];
@@ -493,6 +525,7 @@ class DynamoDB
 
     private function clear()
     {
+        $this->error          = '';
         $this->table          = '';
         $this->mapping        = [];
         $this->key            = [];
