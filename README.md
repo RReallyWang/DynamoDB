@@ -1,5 +1,5 @@
-# DynamoDB
-DynamoDB操作封装
+# DynamoDB操作封装
+像使用MySQL一样使用DynamoDB(Use DynamoDB as you would with MySQL)
 
 ## 目录
 #### 1. [安装](#1)
