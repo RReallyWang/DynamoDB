@@ -126,7 +126,7 @@ class DynamoDB
             return $return;
         } catch (DynamoDbException $e) {
             $this->error = $e->getMessage();
-            $this->clear();
+            $this->clear(true);
             return null;
         }
     }
@@ -268,7 +268,7 @@ class DynamoDB
             return $count;
         } catch (DynamoDbException $e) {
             $this->error = $e->getMessage();
-            $this->clear();
+            $this->clear(true);
             return null;
         }
     }
@@ -293,7 +293,7 @@ class DynamoDB
             return $return;
         } catch (DynamoDbException $e) {
             $this->error = $e->getMessage();
-            $this->clear();
+            $this->clear(true);
             return null;
         }
     }
@@ -317,7 +317,7 @@ class DynamoDB
             return $return;
         } catch (DynamoDbException $e) {
             $this->error = $e->getMessage();
-            $this->clear();
+            $this->clear(true);
             return null;
         }
     }
@@ -351,7 +351,7 @@ class DynamoDB
             }
         } catch (DynamoDbException $e) {
             $this->error = $e->getMessage();
-            $this->clear();
+            $this->clear(true);
             return false;
         }
     }
@@ -387,7 +387,7 @@ class DynamoDB
             }
         } catch (DynamoDbException $e) {
             $this->error = $e->getMessage();
-            $this->clear();
+            $this->clear(true);
             return false;
         }
     }
@@ -419,7 +419,7 @@ class DynamoDB
             }
         } catch (DynamoDbException $e) {
             $this->error = $e->getMessage();
-            $this->clear();
+            $this->clear(true);
             return false;
         }
     }
@@ -439,7 +439,7 @@ class DynamoDB
             }
         } catch (DynamoDbException $e) {
             $this->error = $e->getMessage();
-            $this->clear();
+            $this->clear(true);
             return false;
         }
     }
@@ -471,7 +471,7 @@ class DynamoDB
             }
         } catch (DynamoDbException $e) {
             $this->error = $e->getMessage();
-            $this->clear();
+            $this->clear(true);
             return false;
         }
     }
@@ -523,9 +523,11 @@ class DynamoDB
         return $params;
     }
 
-    private function clear()
+    private function clear(bool $isError = false)
     {
-        $this->error          = '';
+        if (!$isError) {
+            $this->error = '';
+        }
         $this->table          = '';
         $this->mapping        = [];
         $this->key            = [];
