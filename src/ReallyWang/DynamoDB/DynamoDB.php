@@ -14,26 +14,37 @@ use Aws\DynamoDb\Exception\DynamoDbException;
 
 class DynamoDB
 {
+    // 存储dynamodb实例
     private $dynamodb = null;
 
+    // 存储dynamodb处理实例
     private $marshaler = null;
 
+    // 错误信息
     public $error = '';
 
+    // 表名
     private $table = '';
 
+    // 查询主键
     private $key = [];
 
+    // 条件
     private $condition = [];
 
+    // or条件
     private $orCondition = [];
 
+    // 条件value
     private $conditionValue = [];
 
+    // 映射关系
     private $mapping = [];
 
+    // 展示的字段
     private $filed = [];
 
+    // DynamoDB保留字，设置表字段时禁止使用以下字段
     private $reservedWord = [
         'ABORT', 'ABSOLUTE', 'ACTION', 'ADD', 'AFTER', 'AGENT', 'AGGREGATE', 'ALL', 'ALLOCATE',
         'ALTER', 'ANALYZE', 'AND', 'ANY', 'ARCHIVE', 'ARE', 'ARRAY', 'AS', 'ASC', 'ASCII', 'ASENSITIVE', 'ASSERTION',
@@ -92,15 +103,18 @@ class DynamoDB
         'WRITE', 'YEAR', 'ZONE'
     ];
 
+    // 合成查询语句的赋值变量
     private $assignment = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
         't', 'u', 'v', 'w', 'x', 'y', 'z', 'a1', 'b1', 'c1', 'd1', 'e1', 'f1', 'g1', 'h1', 'i1', 'j1', 'k1', 'l1', 'm1',
         'n1', 'o1', 'p1', 'q1', 'r1', 's1', 't1', 'u1', 'v1', 'w1', 'x1', 'y1', 'z1', 'a2', 'b2', 'c2', 'd2', 'e2', 'f2',
         'g2', 'h2', 'i2', 'j2', 'k2', 'l2', 'm2', 'n2', 'o2', 'p2', 'q2', 'r2', 's2', 't2', 'u2', 'v2', 'w2', 'x2', 'y2',
         'z2'];
 
+    //映射赋值变量
     private $mappingWord = ['aa', 'bb', 'cc', 'dd', 'ee', 'ff', 'gg', 'hh', 'ii', 'jj', 'kk', 'll', 'mm', 'nn', 'oo',
         'pp', 'qq', 'rr', 'ss', 'tt', 'uu', 'vv', 'ww', 'xx', 'yy', 'zz'];
 
+    // 构造方法
     public function __construct($config)
     {
         $sdk = new Aws\Sdk($config);
@@ -110,6 +124,13 @@ class DynamoDB
         $this->marshaler = new Marshaler();
     }
 
+    /**
+     * Notes: 查询信息（需要与key方法同时使用）
+     * User: ReallyWang
+     * Date: 2019/2/26
+     * Time: 10:57 AM
+     * @return null
+     */
     public function find()
     {
         $params = $this->recombination();
@@ -131,18 +152,43 @@ class DynamoDB
         }
     }
 
+    /**
+     * Notes: 设置表名
+     * User: ReallyWang
+     * Date: 2019/2/26
+     * Time: 10:32 AM
+     * @param $table
+     * @return $this
+     */
     public function table(string $table)
     {
         $this->table = $table;
         return $this;
     }
 
+    /**
+     * Notes: 设置查询主键（get,scan方法不应调用此方法）
+     * User: ReallyWang
+     * Date: 2019/2/26
+     * Time: 10:41 AM
+     * @param array $key
+     * @return $this
+     */
     public function key(array $key)
     {
         $this->key = $this->marshaler->marshalJson(json_encode($key));
         return $this;
     }
 
+    /**
+     * Notes: 处理条件（需要在field方法之前使用，between 第一个值需比第二个值小，否则会报错）
+     * User: ReallyWang
+     * Date: 2019/2/27
+     * Time: 2:46 PM
+     * @param array $condition
+     * @param bool $isOr
+     * @return $this
+     */
     public function condition(array $condition, $isOr = false)
     {
         if (!$condition) {
@@ -222,11 +268,27 @@ class DynamoDB
         return $this;
     }
 
+    /**
+     * Notes: or处理条件（需要在field方法之前使用，between 第一个值需比第二个值小，否则会报错）
+     * User: ReallyWang
+     * Date: 2019/2/26
+     * Time: 10:40 AM
+     * @param array $condition
+     * @return $this
+     */
     public function orCondition(array $condition)
     {
         return $this->condition($condition, true);
     }
 
+    /**
+     * Notes: 设置查询字段
+     * User: ReallyWang
+     * Date: 2019/2/26
+     * Time: 11:19 AM
+     * @param array $field
+     * @return $this
+     */
     public function field(array $field)
     {
         $this->filed = array_unique(array_merge($this->filed, $field));
@@ -252,6 +314,14 @@ class DynamoDB
         return $this;
     }
 
+    /**
+     * Notes: 计算数量（如果传入的计算字段不存在，但查询条件搜索出了数据，仍会计算出数量）
+     * User: ReallyWang
+     * Date: 2019/2/26
+     * Time: 5:57 PM
+     * @param null $column
+     * @return array|null|\stdClass
+     */
     public function count($column = null)
     {
         if ($column) {
@@ -273,6 +343,12 @@ class DynamoDB
         }
     }
 
+    /**
+     * Notes: 查询多条信息（调用此方法时条件中必须有主键）
+     * User: ReallyWang <w578285038@163.com>
+     * Date: 2019/2/26
+     * Time: 9:08 AM
+     */
     public function get(int $page = 0)
     {
         $params = $this->recombination(true);
@@ -298,6 +374,12 @@ class DynamoDB
         }
     }
 
+    /**
+     * Notes: 全表扫描查询
+     * User: ReallyWang
+     * Date: 2019/2/26
+     * Time: 9:28 AM
+     */
     public function scan(int $page = 0)
     {
         $params = $this->recombination(false, true);
@@ -322,6 +404,14 @@ class DynamoDB
         }
     }
 
+    /**
+     * Notes: 更新数据（没有则会新增数据）
+     * User: ReallyWang
+     * Date: 2019/2/27
+     * Time: 11:11 AM
+     * @param array $value
+     * @return bool|null
+     */
     public function update($value = [])
     {
         if (!$value) {
@@ -356,6 +446,16 @@ class DynamoDB
         }
     }
 
+    /**
+     * Notes: 自增与自减
+     * User: ReallyWang
+     * Date: 2019/3/4
+     * Time: 9:47 AM
+     * @param string $key
+     * @param bool $action
+     * @param int $num
+     * @return bool
+     */
     public function step(string $key, bool $action = true, int $num = 1)
     {
         if (!$key) {
@@ -391,7 +491,14 @@ class DynamoDB
             return false;
         }
     }
-
+    /**
+     * Notes: 删除部分数据(不支持保留字)
+     * User: ReallyWang
+     * Date: 2019/2/27
+     * Time: 11:11 AM
+     * @param array $value
+     * @return bool|null
+     */
     public function remove($value = [])
     {
         if (!$value) {
@@ -424,6 +531,12 @@ class DynamoDB
         }
     }
 
+    /**
+     * Notes: 删除数据
+     * User: ReallyWang
+     * Date: 2019/2/26
+     * Time: 9:28 AM
+     */
     public function delete()
     {
         $params = $this->recombination();
@@ -444,6 +557,14 @@ class DynamoDB
         }
     }
 
+    /**
+     * Notes: 新增数据
+     * User: ReallyWang
+     * Date: 2019/2/27
+     * Time: 1:11 PM
+     * @param array $value
+     * @return bool
+     */
     public function insert(array $value)
     {
         if (!$value) {
@@ -476,11 +597,26 @@ class DynamoDB
         }
     }
 
+    /**
+     * Notes: 获取最后一条错误
+     * User: ReallyWang
+     * Date: 2019/2/26
+     * Time: 10:26 AM
+     */
     public function getError()
     {
         return $this->error == '' ? null : $this->error;
     }
 
+    /**
+     * Notes: 预处理
+     * User: ReallyWang
+     * Date: 2019/2/27
+     * Time: 9:51 AM
+     * @param bool $hasKey
+     * @param bool $useScan
+     * @return array
+     */
     private function recombination($hasKey = false, $useScan = false)
     {
         $params = [];
@@ -523,6 +659,13 @@ class DynamoDB
         return $params;
     }
 
+    /**
+     * Notes: 清理操作残留
+     * User: ReallyWang
+     * Date: 2019/3/4
+     * Time: 9:48 AM
+     * @param bool $isError
+     */
     private function clear(bool $isError = false)
     {
         if (!$isError) {
@@ -539,11 +682,23 @@ class DynamoDB
         reset($this->mappingWord);
     }
 
+    /**
+     * Notes: 创建表
+     * User: ReallyWang
+     * Date: 2019/2/26
+     * Time: 9:29 AM
+     */
     private function createTable()
     {
         // TODO 目前没有需求，以后需要的时候再写
     }
 
+    /**
+     * Notes: 删除表
+     * User: ReallyWang
+     * Date: 2019/2/26
+     * Time: 9:29 AM
+     */
     private function deleteTable()
     {
         // TODO 目前没有需求，以后需要的时候再写
