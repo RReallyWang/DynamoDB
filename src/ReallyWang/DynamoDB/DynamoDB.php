@@ -115,9 +115,13 @@ class DynamoDB
         'pp', 'qq', 'rr', 'ss', 'tt', 'uu', 'vv', 'ww', 'xx', 'yy', 'zz'];
 
     // 构造方法
-    public function __construct($config)
+    public function __construct($connect = 'default')
     {
-        $sdk = new Aws\Sdk($config);
+        if (!isset(DB::$config[$connect])) {
+            throw new \Error("set config error");
+        }
+
+        $sdk = new Aws\Sdk(DB::$config[$connect]);
 
         $this->dynamodb = $sdk->createDynamoDb();
 
@@ -492,7 +496,7 @@ class DynamoDB
         }
     }
     /**
-     * Notes: 删除部分数据(不支持保留字)
+     * Notes: 删除部分数据(请勿使用保留字,更新表达式中不支持替换，所以无法支持保留字)
      * User: ReallyWang
      * Date: 2019/2/27
      * Time: 11:11 AM
