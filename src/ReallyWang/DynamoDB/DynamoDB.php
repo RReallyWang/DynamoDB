@@ -150,9 +150,8 @@ class DynamoDB
             $this->clear();
             return $return;
         } catch (DynamoDbException $e) {
-            $this->error = $e->getMessage();
             $this->clear(true);
-            return null;
+            throw new \Error($e->getMessage());
         }
     }
 
@@ -341,9 +340,8 @@ class DynamoDB
             $this->clear();
             return $count;
         } catch (DynamoDbException $e) {
-            $this->error = $e->getMessage();
             $this->clear(true);
-            return null;
+            throw new \Error($e->getMessage());
         }
     }
 
@@ -372,9 +370,8 @@ class DynamoDB
             $this->clear();
             return $return;
         } catch (DynamoDbException $e) {
-            $this->error = $e->getMessage();
             $this->clear(true);
-            return null;
+            throw new \Error($e->getMessage());
         }
     }
 
@@ -402,9 +399,8 @@ class DynamoDB
             $this->clear();
             return $return;
         } catch (DynamoDbException $e) {
-            $this->error = $e->getMessage();
             $this->clear(true);
-            return null;
+            throw new \Error($e->getMessage());
         }
     }
 
@@ -444,9 +440,8 @@ class DynamoDB
                 return false;
             }
         } catch (DynamoDbException $e) {
-            $this->error = $e->getMessage();
             $this->clear(true);
-            return false;
+            throw new \Error($e->getMessage());
         }
     }
 
@@ -490,9 +485,8 @@ class DynamoDB
                 return false;
             }
         } catch (DynamoDbException $e) {
-            $this->error = $e->getMessage();
             $this->clear(true);
-            return false;
+            throw new \Error($e->getMessage());
         }
     }
     /**
@@ -529,9 +523,8 @@ class DynamoDB
                 return false;
             }
         } catch (DynamoDbException $e) {
-            $this->error = $e->getMessage();
             $this->clear(true);
-            return false;
+            throw new \Error($e->getMessage());
         }
     }
 
@@ -555,9 +548,8 @@ class DynamoDB
                 return false;
             }
         } catch (DynamoDbException $e) {
-            $this->error = $e->getMessage();
             $this->clear(true);
-            return false;
+            throw new \Error($e->getMessage());
         }
     }
 
@@ -595,21 +587,9 @@ class DynamoDB
                 }
             }
         } catch (DynamoDbException $e) {
-            $this->error = $e->getMessage();
             $this->clear(true);
-            return false;
+            throw new \Error($e->getMessage());
         }
-    }
-
-    /**
-     * Notes: 获取最后一条错误
-     * User: ReallyWang
-     * Date: 2019/2/26
-     * Time: 10:26 AM
-     */
-    public function getError()
-    {
-        return $this->error == '' ? null : $this->error;
     }
 
     /**
