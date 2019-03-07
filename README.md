@@ -1,6 +1,6 @@
 # DynamoDB操作封装
 像使用MySQL一样使用DynamoDB(Use DynamoDB as you would with MySQL)  
-禁止使用保留字，具体哪些是保留字可在包文件 DynamoDb.php 文件中查看，如果已经使用保留字的用户，请读下一条
+禁止使用保留字，具体哪些是保留字可在包文件 DynamoDb.php 文件中查看，如果已经使用保留字的用户，请读下一条  
 保留字问题已在内部处理，使用者可以不用关心保留字问题（AWS不支持的地方此工具同样不支持，AWS支持的地方此工具已内部处理）  
 
 
