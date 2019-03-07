@@ -24,7 +24,7 @@ composer require reallywang/dynamo-db
 ```
 或是composer.json中require下添加
 ```
-"reallywang/dynamo-db": "^1.3"
+"reallywang/dynamo-db": "^1.4"
 ```
 
 ### <span id = "2">2. 使用</span>
